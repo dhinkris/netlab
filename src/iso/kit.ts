@@ -96,7 +96,7 @@ export function inset(plan: Plan, k: number): Plan {
 
 // ---------- tones ----------
 
-export type Fam = "lo" | "mid" | "hi" | "lit" | "sig" | "ok" | "warn" | "blue" | "teal" | "violet" | "rose";
+export type Fam = "lo" | "mid" | "hi" | "lit" | "sig" | "ok" | "warn" | "blue" | "teal" | "violet" | "rose" | "moss" | "sea" | "sand";
 
 function sideFill(fam: Fam, p: number) {
   return `color-mix(in srgb, var(--${fam}-l) ${Math.round(p * 100)}%, var(--${fam}-d))`;
@@ -153,6 +153,8 @@ export type SolidOpts = {
   id?: string;
   /** hide the top face (open trays drawn from parts) */
   noTop?: boolean;
+  /** offset of the top face from the bottom (a leaning solid: levers, masts) */
+  shift?: V2;
 };
 
 export function prism(c: Cam, plan: Plan, z0: number, h: number, fam: Fam, o: SolidOpts = {}): Solid {
@@ -165,6 +167,7 @@ export function prism(c: Cam, plan: Plan, z0: number, h: number, fam: Fam, o: So
   }
   const sgn = area > 0 ? 1 : -1;
   const z1 = z0 + h;
+  const [sx, sy] = o.shift ?? [0, 0];
   const faces: { d: string; fill: string; dep: number }[] = [];
   for (let i = 0; i < n; i++) {
     const a = plan.pts[i], b = plan.pts[(i + 1) % n];
@@ -174,7 +177,7 @@ export function prism(c: Cam, plan: Plan, z0: number, h: number, fam: Fam, o: So
     const nx = (sgn * ey) / L, ny = (-sgn * ex) / L;
     const toward = nx * c.sa + ny * c.ca;
     if (toward <= 1e-6) continue;
-    const quad: V3[] = [[a[0], a[1], z0], [b[0], b[1], z0], [b[0], b[1], z1], [a[0], a[1], z1]];
+    const quad: V3[] = [[a[0], a[1], z0], [b[0], b[1], z0], [b[0] + sx, b[1] + sy, z1], [a[0] + sx, a[1] + sy, z1]];
     faces.push({
       d: line3(c, quad, true),
       fill: sideFill(fam, shadeOf(c, nx, ny)),
@@ -182,7 +185,7 @@ export function prism(c: Cam, plan: Plan, z0: number, h: number, fam: Fam, o: So
     });
   }
   faces.sort((p, q) => p.dep - q.dep);
-  const top: V3[] = plan.pts.map(([x, y]) => [x, y, z1]);
+  const top: V3[] = plan.pts.map(([x, y]) => [x + sx, y + sy, z1]);
   const out: Face[] = faces.map(({ d, fill }) => ({ d, fill }));
   if (!o.noTop) out.push({ d: line3(c, top, true), fill: `var(--${fam}-t)` });
 
@@ -193,12 +196,12 @@ export function prism(c: Cam, plan: Plan, z0: number, h: number, fam: Fam, o: So
     const p = plan.pts[i];
     const prev = plan.pts[(i - 1 + n) % n], next = plan.pts[(i + 1) % n];
     const t1 = normalToward(c, prev, p, sgn), t2 = normalToward(c, p, next, sgn);
-    if (t1 > 1e-6 && t2 > 1e-6) creases += line3(c, [[p[0], p[1], z0], [p[0], p[1], z1]]);
+    if (t1 > 1e-6 && t2 > 1e-6) creases += line3(c, [[p[0], p[1], z0], [p[0] + sx, p[1] + sy, z1]]);
   }
-  if (o.bevel) creases += line3(c, inset(plan, o.bevel).pts.map(([x, y]) => [x, y, z1] as V3), true);
+  if (o.bevel) creases += line3(c, inset(plan, o.bevel).pts.map(([x, y]) => [x + sx, y + sy, z1] as V3), true);
 
   const all: V2[] = [];
-  for (const [x, y] of plan.pts) { all.push(proj(c, [x, y, z0])); all.push(proj(c, [x, y, z1])); }
+  for (const [x, y] of plan.pts) { all.push(proj(c, [x, y, z0])); all.push(proj(c, [x + sx, y + sy, z1])); }
   let cx = 0, cy = 0;
   for (const p of plan.pts) { cx += p[0]; cy += p[1]; }
   return {
@@ -229,7 +232,7 @@ export function cyl(c: Cam, cx: number, cy: number, z: number, r: number, h: num
 
 // ---------- lines, dots, text ----------
 
-export type Tone = "faint" | "lo" | "mid" | "hi" | "lit" | "sig" | "ok" | "warn" | "blue" | "teal" | "violet" | "rose" | "ink";
+export type Tone = "faint" | "lo" | "mid" | "hi" | "lit" | "sig" | "ok" | "warn" | "blue" | "teal" | "violet" | "rose" | "ink" | "moss" | "sea" | "sand";
 
 export type LineItem = { kind: "line"; d: string; tone: Tone; w: number; layer: number; key: number; dash?: string };
 export type DotItem = { kind: "dots"; pts: V2[]; r: number; tone: Tone; ring?: boolean; layer: number; key: number };
@@ -385,4 +388,119 @@ export function boundsOf(items: Item[], pad = 8): { x: number; y: number; w: num
     else if (it.kind === "halo") take(it.d);
   }
   return { x: x0 - pad, y: y0 - pad, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 };
+}
+
+// ---------- shared scenery ----------
+
+/** A bench: halo, four feet, a bevelled top with corner screws and a front ruler. */
+export function bench(c: Cam, bx: number, by: number, bw: number, bd: number, z0: number): Item[] {
+  const it: Item[] = [];
+  it.push(halo(c, rrect(bx, by, bw, bd, 5), 5));
+  for (const [fx, fy] of [[bx + 7, by + 7], [bx + bw - 7, by + 7], [bx + 7, by + bd - 7], [bx + bw - 7, by + bd - 7]]) {
+    it.push(cyl(c, fx, fy, 0, 3.5, 3, "lo", { key: -60 }));
+  }
+  it.push(box(c, bx, by, 3, bw, bd, z0 - 3, "lo", { key: -50, r: 5, bevel: 1.2 }));
+  it.push({ ...screws(c, bx, by, bw, bd, z0, 4), key: -49 });
+  it.push(...ticksX(c, bx + 10, bx + bw - 10, by + bd - 6, z0, 4, 3, 5).map((l) => ({ ...l, key: -48 })));
+  it.push({ ...lineItem(c, [[bx + 10, by + bd - 2.8, z0], [bx + bw - 10, by + bd - 2.8, z0]], "lo", 0.4), key: -48 });
+  return it;
+}
+
+/** A floor cable drawn as a tube: dark sheath, coloured core, a highlight. */
+export function tube(c: Cam, pts: V3[], core: Tone, key: number, w = 2.8): LineItem[] {
+  return [
+    { kind: "line", d: line3(c, pts), tone: "lo", w, layer: 0, key },
+    { kind: "line", d: line3(c, pts), tone: core, w: w * 0.64, layer: 0, key: key + 0.001 },
+    { kind: "line", d: line3(c, pts.map(([x, y, z]) => [x - 0.3, y - 0.3, z + w * 0.18] as V3)), tone: "hi", w: 0.35, layer: 0, key: key + 0.002 },
+  ];
+}
+
+/** Point at fraction u (0..1) along a polyline, by length in plan. */
+export function alongPath(pts: V3[], u: number): V3 {
+  const seg: number[] = [];
+  let L = 0;
+  for (let k = 1; k < pts.length; k++) {
+    const d = Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1], pts[k][2] - pts[k - 1][2]);
+    seg.push(d);
+    L += d;
+  }
+  let t = Math.max(0, Math.min(1, u)) * L;
+  for (let k = 0; k < seg.length; k++) {
+    if (t <= seg[k] || k === seg.length - 1) {
+      const f = seg[k] ? Math.min(1, t / seg[k]) : 0;
+      const a = pts[k], b = pts[k + 1];
+      return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f];
+    }
+    t -= seg[k];
+  }
+  return pts[pts.length - 1];
+}
+
+export const ease = (u: number) => u * u * (3 - 2 * u);
+export const lerp = (a: number, b: number, u: number) => a + (b - a) * u;
+
+/** A scripted timeline of segments; frameAt(t) evaluates the one that is playing. */
+export type Seg<F> = { d: number; f: (u: number) => F };
+export function frameAt<F>(segs: Seg<F>[], t: number): { fr: F; step: number } {
+  let acc = 0;
+  for (let k = 0; k < segs.length; k++) {
+    if (t <= acc + segs[k].d) return { fr: segs[k].f(Math.max(0, (t - acc) / segs[k].d)), step: k };
+    acc += segs[k].d;
+  }
+  return { fr: segs[segs.length - 1].f(1), step: segs.length - 1 };
+}
+export const totalOf = <F>(segs: Seg<F>[]) => segs.reduce((s, x) => s + x.d, 0);
+
+
+// ---------- organic shapes and routes ----------
+
+/** A pebble-like, almost convex plan: a circle whose radius wobbles smoothly with a seed. */
+export function blob(cx: number, cy: number, rx: number, ry: number, seed: number, wobble = 0.1, n = 40): Plan {
+  const pts: V2[] = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2;
+    const w = 1 + wobble * (Math.sin(a * 2 + seed) * 0.6 + Math.sin(a * 3 + seed * 1.7) * 0.4);
+    pts.push([cx + rx * w * Math.cos(a), cy + ry * w * Math.sin(a)]);
+  }
+  return { pts, sharp: pts.map(() => false) };
+}
+
+/** Offset a plan polyline sideways by d (positive = left of travel). */
+export function offsetPath(pts: V3[], d: number): V3[] {
+  return pts.map((p, i) => {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const L = Math.hypot(dx, dy) || 1;
+    return [p[0] - (dy / L) * d, p[1] + (dx / L) * d, p[2]] as V3;
+  });
+}
+
+/** A smooth plan curve through control points (Catmull-Rom), sampled every ~step units. */
+export function smoothPath(ctrl: V3[], step = 2): V3[] {
+  const out: V3[] = [];
+  for (let i = 0; i < ctrl.length - 1; i++) {
+    const p0 = ctrl[Math.max(0, i - 1)], p1 = ctrl[i], p2 = ctrl[i + 1], p3 = ctrl[Math.min(ctrl.length - 1, i + 2)];
+    const L = Math.hypot(p2[0] - p1[0], p2[1] - p1[1]);
+    const n = Math.max(2, Math.ceil(L / step));
+    for (let k = 0; k < n; k++) {
+      const t = k / n, t2 = t * t, t3 = t2 * t;
+      const f = (a: number, b: number, cc: number, d: number) => 0.5 * (2 * b + (-a + cc) * t + (2 * a - 5 * b + 4 * cc - d) * t2 + (-a + 3 * b - 3 * cc + d) * t3);
+      out.push([f(p0[0], p1[0], p2[0], p3[0]), f(p0[1], p1[1], p2[1], p3[1]), f(p0[2], p1[2], p2[2], p3[2])]);
+    }
+  }
+  out.push(ctrl[ctrl.length - 1]);
+  return out;
+}
+
+/** Plan heading (radians) of a path at fraction u. */
+export function headingAt(pts: V3[], u: number): number {
+  const a = alongPath(pts, Math.max(0, u - 0.01)), b = alongPath(pts, Math.min(1, u + 0.01));
+  return Math.atan2(b[1] - a[1], b[0] - a[0]);
+}
+
+/** A rectangle plan centred on (cx, cy), rotated by angle a. */
+export function rotRect(cx: number, cy: number, w: number, d: number, a: number): Plan {
+  const c = Math.cos(a), s = Math.sin(a);
+  const pts: V2[] = [[-w / 2, -d / 2], [w / 2, -d / 2], [w / 2, d / 2], [-w / 2, d / 2]].map(([x, y]) => [cx + x * c - y * s, cy + x * s + y * c]);
+  return { pts, sharp: [true, true, true, true] };
 }

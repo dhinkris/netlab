@@ -4,17 +4,21 @@ An interactive networking course, from bits on a wire to cloud virtual networks.
 
 ## Lessons
 
-**Fundamentals** (available now)
+Nine topics, 34 lessons, each built around an interactive figure:
 
-| Lesson | Figure |
+| Topic | Lessons |
 |---|---|
-| OSI & TCP/IP models | Encapsulation lift: a parcel gains a header at each layer on the way down and loses them on the way up |
-| IP addressing | Address register: 32 bit pins in four octets, with private/public/special classification |
-| Subnetting & CIDR | Prefix caliper: the sliding jaw sets the prefix; network vs host bits, mask, host counts |
-| Ports & protocols | Port bays: TCP handshake, UDP, and a closed port answering with RST |
-| MAC addresses & ARP | ARP on a switch: broadcast request, MAC learning, unicast reply, ARP cache |
+| Fundamentals | OSI & TCP/IP · IP addressing · Subnetting & CIDR · Ports & protocols · MAC & ARP |
+| Core services | DNS · DHCP · NAT · NTP |
+| Routing & switching | Route tables & longest-prefix match · Hops, TTL & traceroute · BGP · VLANs & trunks |
+| Traffic flow | Inbound & outbound · North-south & east-west · Stateful vs stateless · Asymmetric routing |
+| Security | NSG rules & priority · ASGs & service tags · Azure Firewall & WAF · DDoS protection |
+| Cloud virtual networks | VNets & subnets · VNet peering · Hub-and-spoke · UDRs & next hop types |
+| Outbound connectivity | Outbound options · SNAT port exhaustion · Egress IPs & allow-listing |
+| Load balancing | Azure Load Balancer · Application Gateway · Front Door & Traffic Manager |
+| Private access to PaaS | Service vs private endpoints · Private DNS · Private Link service |
 
-Later topics (core services, routing, security, Azure VNets, load balancing, hybrid connectivity and more) are listed in the app as coming soon.
+Still to come: hybrid connectivity, application layer, Kubernetes networking, monitoring & troubleshooting.
 
 ## Run locally
 

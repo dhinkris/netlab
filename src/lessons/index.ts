@@ -1,14 +1,39 @@
-import type { ComponentType } from "react";
-import Osi from "./fundamentals/Osi";
-import IpAddressing from "./fundamentals/IpAddressing";
-import Subnetting from "./fundamentals/Subnetting";
-import Ports from "./fundamentals/Ports";
-import MacArp from "./fundamentals/MacArp";
+import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 
-export const LESSONS: Record<string, ComponentType> = {
-  "fundamentals/osi": Osi,
-  "fundamentals/ip-addressing": IpAddressing,
-  "fundamentals/subnetting": Subnetting,
-  "fundamentals/ports": Ports,
-  "fundamentals/mac-arp": MacArp,
+// Each lesson is its own chunk, loaded when it is first opened.
+export const LESSONS: Record<string, LazyExoticComponent<ComponentType>> = {
+  "fundamentals/osi": lazy(() => import("./fundamentals/Osi")),
+  "fundamentals/ip-addressing": lazy(() => import("./fundamentals/IpAddressing")),
+  "fundamentals/subnetting": lazy(() => import("./fundamentals/Subnetting")),
+  "fundamentals/ports": lazy(() => import("./fundamentals/Ports")),
+  "fundamentals/mac-arp": lazy(() => import("./fundamentals/MacArp")),
+  "core-services/dns": lazy(() => import("./core-services/Dns")),
+  "core-services/dhcp": lazy(() => import("./core-services/Dhcp")),
+  "core-services/nat": lazy(() => import("./core-services/Nat")),
+  "core-services/ntp": lazy(() => import("./core-services/Ntp")),
+  "routing/route-tables": lazy(() => import("./routing/RouteTables")),
+  "routing/hops-ttl": lazy(() => import("./routing/HopsTtl")),
+  "routing/bgp": lazy(() => import("./routing/Bgp")),
+  "routing/vlans": lazy(() => import("./routing/Vlans")),
+  "traffic/inbound-outbound": lazy(() => import("./traffic/InboundOutbound")),
+  "traffic/north-south-east-west": lazy(() => import("./traffic/NorthSouthEastWest")),
+  "traffic/stateful": lazy(() => import("./traffic/Stateful")),
+  "traffic/asymmetric": lazy(() => import("./traffic/Asymmetric")),
+  "security/nsg-rules": lazy(() => import("./security/NsgRules")),
+  "security/asgs": lazy(() => import("./security/Asgs")),
+  "security/firewall-waf": lazy(() => import("./security/FirewallWaf")),
+  "security/ddos": lazy(() => import("./security/Ddos")),
+  "vnet/vnets-subnets": lazy(() => import("./vnet/VnetsSubnets")),
+  "vnet/peering": lazy(() => import("./vnet/Peering")),
+  "vnet/hub-spoke": lazy(() => import("./vnet/HubSpoke")),
+  "vnet/udrs": lazy(() => import("./vnet/Udrs")),
+  "outbound/options": lazy(() => import("./outbound/Options")),
+  "outbound/snat-exhaustion": lazy(() => import("./outbound/SnatExhaustion")),
+  "outbound/egress-ips": lazy(() => import("./outbound/EgressIps")),
+  "load-balancing/azure-lb": lazy(() => import("./lb/AzureLb")),
+  "load-balancing/app-gateway": lazy(() => import("./lb/AppGateway")),
+  "load-balancing/global": lazy(() => import("./lb/Global")),
+  "private-access/endpoints": lazy(() => import("./private/Endpoints")),
+  "private-access/private-dns": lazy(() => import("./private/PrivateDns")),
+  "private-access/private-link-service": lazy(() => import("./private/PrivateLinkService")),
 };

@@ -23,8 +23,11 @@
   --teal-d: #155f58; --teal-l: #27a193; --teal-t: #5ed1c2;
   --violet-d: #46308a; --violet-l: #7b58d6; --violet-t: #a98bf2;
   --rose-d: #772850; --rose-l: #c44e87; --rose-t: #ec88b8;
+  --moss-d: #2c4429; --moss-l: #4c7343; --moss-t: #6a975c;
+  --sea-d: #0d2538; --sea-l: #173f5e; --sea-t: #1f4f75;
+  --sand-d: #5f5034; --sand-l: #8f7a51; --sand-t: #b49b6b;
 
-  --c-blue: #6aa8f0; --c-teal: #5ed1c2; --c-violet: #a98bf2; --c-rose: #ec88b8; --c-amber: #f2b553;
+  --c-blue: #6aa8f0; --c-teal: #5ed1c2; --c-violet: #a98bf2; --c-rose: #ec88b8; --c-amber: #f2b553; --c-moss: #86b874; --c-sand: #d4b982;
 
   --edge: #8c96a0;
   --crease: #555e66;
@@ -33,6 +36,7 @@
   --s-faint: #2c3237; --s-lo: #4a535b; --s-mid: #7a848d; --s-hi: #b8c0c7;
   --s-lit: #ffffff; --s-sig: #f2b553; --s-ok: #5fc48a; --s-warn: #e0705a;
   --s-blue: #6aa8f0; --s-teal: #5ed1c2; --s-violet: #a98bf2; --s-rose: #ec88b8; --s-ink: #0e1012;
+  --s-moss: #86b874; --s-sea: #5d9ccc; --s-sand: #d4b982;
 
   color-scheme: dark;
 }
@@ -61,8 +65,11 @@
   --teal-d: #2f8a80; --teal-l: #6cc2b7; --teal-t: #ace3db;
   --violet-d: #6c53b8; --violet-l: #9f88e0; --violet-t: #d0c3f5;
   --rose-d: #ac4c7b; --rose-l: #d888ae; --rose-t: #f2c2d8;
+  --moss-d: #6c9760; --moss-l: #98bf89; --moss-t: #c3ddb6;
+  --sea-d: #79a6c9; --sea-l: #a9cae4; --sea-t: #cfe3f2;
+  --sand-d: #c2aa7c; --sand-l: #ddc9a0; --sand-t: #eee2c6;
 
-  --c-blue: #2763a8; --c-teal: #1d7f74; --c-violet: #5b3fb0; --c-rose: #a3366b; --c-amber: #a8640e;
+  --c-blue: #2763a8; --c-teal: #1d7f74; --c-violet: #5b3fb0; --c-rose: #a3366b; --c-amber: #a8640e; --c-moss: #3d7432; --c-sand: #86692f;
 
   --edge: #2a2c2f;
   --crease: #8f8a82;
@@ -71,6 +78,7 @@
   --s-faint: #d5d1c9; --s-lo: #aaa59c; --s-mid: #77736c; --s-hi: #3e3f40;
   --s-lit: #000000; --s-sig: #a8640e; --s-ok: #23804e; --s-warn: #b63f2a;
   --s-blue: #2763a8; --s-teal: #1d7f74; --s-violet: #5b3fb0; --s-rose: #a3366b; --s-ink: #15171a;
+  --s-moss: #3d7432; --s-sea: #2a6797; --s-sand: #86692f;
 
   color-scheme: light;
 }
@@ -243,6 +251,10 @@ input[type="range"] { accent-color: var(--accent); }
 .t-violet { stroke: var(--s-violet); fill: var(--s-violet); }
 .t-rose { stroke: var(--s-rose); fill: var(--s-rose); }
 .t-ink { stroke: var(--s-ink); fill: var(--s-ink); }
+.t-moss { stroke: var(--s-moss); fill: var(--s-moss); }
+.t-sea { stroke: var(--s-sea); fill: var(--s-sea); }
+.t-sand { stroke: var(--s-sand); fill: var(--s-sand); }
+.sw-moss { background: var(--moss-t); } .sw-sea { background: var(--sea-t); } .sw-sand { background: var(--sand-t); }
 svg .iso-ring { fill: none; }
 svg path.iso-ln { fill: none; }
 svg text.iso-tx { stroke: none; }
@@ -253,7 +265,7 @@ svg text.iso-tx { stroke: none; }
 .sw-lo { background: var(--lo-t); } .sw-mid { background: var(--mid-t); } .sw-hi { background: var(--hi-t); }
 .sw-lit { background: var(--lit-t); } .sw-sig { background: var(--sig-t); } .sw-ok { background: var(--ok-t); } .sw-warn { background: var(--warn-t); }
 .sw-blue { background: var(--blue-t); } .sw-teal { background: var(--teal-t); } .sw-violet { background: var(--violet-t); } .sw-rose { background: var(--rose-t); }
-.c-blue, .iso-readout .c-blue { color: var(--c-blue); } .c-teal, .iso-readout .c-teal { color: var(--c-teal); } .c-violet, .iso-readout .c-violet { color: var(--c-violet); } .c-rose, .iso-readout .c-rose { color: var(--c-rose); } .c-amber, .iso-readout .c-amber { color: var(--c-amber); }
+.c-blue, .iso-readout .c-blue { color: var(--c-blue); } .c-teal, .iso-readout .c-teal { color: var(--c-teal); } .c-violet, .iso-readout .c-violet { color: var(--c-violet); } .c-rose, .iso-readout .c-rose { color: var(--c-rose); } .c-amber, .iso-readout .c-amber { color: var(--c-amber); } .c-moss, .iso-readout .c-moss { color: var(--c-moss); } .c-sand, .iso-readout .c-sand { color: var(--c-sand); }
 .tile { border-top: 3px solid var(--tile-c, var(--line)); }
 .lesson h1::after { content: ""; display: block; width: 56px; height: 4px; border-radius: 4px; background: var(--accent); margin-top: 10px; }
 .caption { font-size: 13.5px; color: var(--muted); margin: 8px 2px 0; }

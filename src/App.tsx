@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { CURRICULUM, flatLessons } from "./content/curriculum";
 import { LESSONS } from "./lessons";
 
@@ -122,7 +122,7 @@ export default function App() {
     body = (
       <article className="lesson" style={{ "--accent": `var(--c-${f.lesson.hue})` } as React.CSSProperties}>
         <div className="crumbs"><a href="#/">Topics</a> / <a href={`#/${f.topic.slug}`}>{f.topic.title}</a> / {f.lesson.title}</div>
-        {Lesson ? <Lesson /> : <p>Coming soon.</p>}
+        {Lesson ? <Suspense fallback={<p className="lede">Loading lesson…</p>}><Lesson /></Suspense> : <p>Coming soon.</p>}
         <div style={{ marginTop: 32 }}>
           <button className="pill-btn" onClick={() => markDone(key, !done.has(key))}>
             {done.has(key) ? "✓ Marked as done" : "Mark lesson as done"}
